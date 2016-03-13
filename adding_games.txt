@@ -1,0 +1,58 @@
+How to add new games
+
+First game data needs to be created for the game. The easiest thing is to make a new game data text file with just one game in it and adjust the screenshot and start button press frame timings to get good screenshots. Then you can take this and paste it into the real game database. It's ideal to try and reduce the amount of time waiting for the next screenshot time by using the start button.
+
+Here is an example game data:
+
+Dracula X
+200 500 600 900
+300 510 610
+
+The first line is the game name, which is used as a key to match with the paths file. The game data name and paths name must match. The games must also be in the same order. Do not have any newlines between games. For example if you want to have two games, do it as follows:
+
+Dracula X
+200 500 600 900
+300 510 610
+Albert Odyssey
+600 1100
+200 400 600 800
+
+The second line is screenshot frame timings. A screenshot will be taken at 200, 500, 600 and 900 frames for Dracula X.
+
+The third line is the start button press timings. The start button will be pressed at 300, 510 and 610 frames. If no start button presses are required, type null, like in the following example:
+
+Scorcher
+500 600 1100 1300
+null
+
+Here is an example paths file:
+
+Dracula X
+C:/saturn_iso/dracula_x.cue
+
+The first line is the game name, matching
+
+Do not have newlines between games. For example with two games:
+
+Dracula X
+C:/saturn_iso/dracula_x.cue
+Albert Odyssey
+C:/saturn_iso/albert.cue
+
+Note that the line endings need to match your operating system. Windows line endings will fail if used on Linux.
+
+Once you have some data you'd like to test, the runner needs to be run in game dumping mode. This can be done as follows:
+
+yabause game dump F:/saturn_iso/game_data.txt F:/saturn_iso/paths.txt F:/saturn_iso/output/
+
+The first two arguments specify that the runner is in game screenshot dumping mode. The remaining arguments specify the game data file, paths file, and the output folder. The trailing slash on the output folder is required.
+
+You should see "Game testing" "Generating images for GAME_NAME". If everything goes well the output folder should be filled with the screenshots you specified.
+
+Next, the runner should be run in screenshot checking mode to make sure that the new outputs can be checked correctly. This can be done as follows:
+
+yabause game check F:/saturn_iso/game_data.txt F:/saturn_iso/paths.txt F:/saturn_iso/output/ F:/saturn_iso/failures/
+
+"dump" was changed to "check" so that the images will be checked. The next two arguments are still the game data and paths files. The fifth argument specifies the folder of screenshots to check, which is the dumping output folder. The last argument specifies where to write any failed check screenshots.
+
+If the check worked, the CI can be updated. Change the yab-game-ci/game_data.txt and yab-game-data/paths.txt and change the SCREENSHOT_PATH variable in yab-game-ci/web/ci-hook.sh to the output folder containing the generated screenshots. Then restart the server.
