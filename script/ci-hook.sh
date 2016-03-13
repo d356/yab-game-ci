@@ -1,3 +1,5 @@
+SCREENSHOT_PATH="./yabauseut-bin/game_screenshots/"
+
 #compile runner
 cd ..
 cd yabause/yabause/src/runner
@@ -12,5 +14,5 @@ make
 rm -rf failures
 mkdir failures
 git clone https://github.com/d356/yabauseut-bin.git
-./src/runner/yabause game check ../../game_data.txt ../../paths.txt ./yabauseut-bin/game_screenshots/ ./failures/
+./src/runner/yabause game check ../../game_data.txt ../../paths.txt $SCREENSHOT_PATH ./failures/
 cp -r ./failures/. ../../web/public/
