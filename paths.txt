@@ -1,2 +1,2 @@
 Scorcher
-/home/d/dev/iso/scorcher.cue
+/home/d/iso/scorcher.cue

@@ -13,3 +13,4 @@ rm -rf failures
 mkdir failures
 git clone https://github.com/d356/yabauseut-bin.git
 ./src/runner/yabause game check ../../game_data.txt ../../paths.txt ./yabauseut-bin/game_screenshots/ ./failures/
+cp -r ./failures/. ../../web/public/

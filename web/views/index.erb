@@ -7,6 +7,9 @@
   <meta http-equiv="refresh" content="10">
 </head>
 <body>
-  <%= output %>
+  <%= output %></br></br>
+  <% for image in images %>
+    <%= "<img src=\"#{image}\">" %>
+  <% end %>
 </body>
 </html>
