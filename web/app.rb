@@ -20,6 +20,11 @@ class App < Sinatra::Base
     erb :index, :locals => {:output => @@output, :images => images}
   end
 
+  get '/build' do
+    clone_url = "http://www.github.com/Yabause/yabause.git"
+    regular_build("refs/heads/master",clone_url)
+  end
+
   post '/event_handler' do
     @payload = JSON.parse(params[:payload])
 
@@ -34,20 +39,22 @@ class App < Sinatra::Base
   end
 
   helpers do
+    def regular_build(branch_name, clone_url)
+      @@output = "Build triggered<br/>"
+      `rm public/*`
+      `cd .. ; rm -rf yabause`
+      g = Git.clone clone_url, "../yabause"
+      g.checkout branch_name
+      @@output = @@output  + `cd ../script ; sh ci-hook.sh`
+      @@output.gsub!(/\r?\n/, "<br/>")
+    end
+      
     def process_push(push)
       branch_name = push['ref']
       repo_name = push['repository']['full_name']
       clone_url = "http://www.github.com/" + repo_name + ".git"
       @@output = "Building push to " + branch_name + " at " + repo_name + "<br/>SHA: " + push['after'] + "<br/><br/>"
-
-      `rm public/*`
-      `cd .. ; rm -rf yabause`
-      g = Git.clone clone_url, "../yabause"
-      g.checkout branch_name
-
-      @@output = @@output  + `cd ../script ; sh ci-hook.sh`
-      
-      @@output.gsub!(/\r?\n/, "<br/>")
+      regular_build(branch_name, clone_url)
     end
 
     def process_pull_request(pull_request)
