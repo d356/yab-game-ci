@@ -22,7 +22,14 @@ class App < Sinatra::Base
 
   get '/build' do
     clone_url = "http://www.github.com/Yabause/yabause.git"
+    @@output = "Build triggered<br/>"
     regular_build("refs/heads/master",clone_url)
+  end
+
+  get '/generate' do
+    @@output = "Generating images...<br/>"
+    @@output = @@output + `cd ../script ; sh generate.sh`
+    insert_br()
   end
 
   post '/event_handler' do
@@ -39,22 +46,27 @@ class App < Sinatra::Base
   end
 
   helpers do
+
+    def insert_br()
+      @@output.gsub!(/\r?\n/, "<br/>")
+    end
+
     def regular_build(branch_name, clone_url)
-      @@output = "Build triggered<br/>"
       `rm public/*`
       `cd .. ; rm -rf yabause`
       g = Git.clone clone_url, "../yabause"
       g.checkout branch_name
       @@output = @@output  + `cd ../script ; sh ci-hook.sh`
-      @@output.gsub!(/\r?\n/, "<br/>")
+      insert_br()
     end
       
     def process_push(push)
       branch_name = push['ref']
       repo_name = push['repository']['full_name']
       clone_url = "http://www.github.com/" + repo_name + ".git"
-      @@output = "Building push to " + branch_name + " at " + repo_name + "<br/>SHA: " + push['after'] + "<br/><br/>"
-      regular_build(branch_name, clone_url)
+      sha = push['after']
+      @@output = "Building push to " + branch_name + " at " + repo_name + "<br/>SHA: " + sha + "<br/>" + "Clone url: " + clone_url + "<br/><br/>"
+      regular_build(sha, clone_url)
     end
 
     def process_pull_request(pull_request)
@@ -75,7 +87,7 @@ class App < Sinatra::Base
           })
       end
 
-      @@output = "Building " + pull_request['head']['label'] + " for " + pr1 + "<br/>" + "SHA: " + sha + "<br/><br/>"
+      @@output = "Building pull request " + pull_request['head']['label'] + " for " + pr1 + "<br/>" + "SHA: " + sha + "<br/><br/>"
 
       repo_name = pull_request["head"]["repo"]["full_name"]
       clone_url = "http://www.github.com/" + repo_name + ".git"
@@ -106,7 +118,7 @@ class App < Sinatra::Base
         end
       end
 
-      @@output.gsub!(/\r?\n/, "<br/>")
+      insert_br()
     end
   end
 end
